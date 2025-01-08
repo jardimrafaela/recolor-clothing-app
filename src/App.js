@@ -45,6 +45,12 @@ const RecolorTool = () => {
     img.onload = () => setCurrentCorsetImage(img);
   }, [corsetHue]);
 
+  // Função para calcular escala e centralizar a imagem
+  const calculateScale = (image, canvasWidth, canvasHeight) => {
+    const scale = Math.min(canvasWidth / image.width, canvasHeight / image.height);
+    return scale;
+  };
+
   return (
     <div className="editor">
       <h1>Recolor Your Clothes!</h1>
@@ -81,15 +87,23 @@ const RecolorTool = () => {
           {currentBaseImage && (
             <Image
               image={currentBaseImage}
-              width={500}
-              height={500}
+              x={250}
+              y={250}
+              offsetX={currentBaseImage.width / 2}
+              offsetY={currentBaseImage.height / 2}
+              scaleX={calculateScale(currentBaseImage, 500, 500)}
+              scaleY={calculateScale(currentBaseImage, 500, 500)}
             />
           )}
           {currentCorsetImage && (
             <Image
               image={currentCorsetImage}
-              width={500}
-              height={500}
+              x={250}
+              y={250}
+              offsetX={currentCorsetImage.width / 2}
+              offsetY={currentCorsetImage.height / 2}
+              scaleX={calculateScale(currentCorsetImage, 500, 500)}
+              scaleY={calculateScale(currentCorsetImage, 500, 500)}
             />
           )}
         </Layer>

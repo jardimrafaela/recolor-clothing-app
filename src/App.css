@@ -85,9 +85,16 @@ button:hover {
 
 /* Canvas (imagem) */
 .canvas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border: 2px solid #ddd;
   border-radius: 10px;
   margin-bottom: 20px;
+  background-color: #ffffff;
+  width: 500px;
+  height: 500px;
+  overflow: hidden;
 }
 /* Regras de responsividade */
 @media (max-width: 768px) {
