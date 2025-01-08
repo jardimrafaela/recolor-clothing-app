@@ -2,50 +2,74 @@ import React, { useState, useEffect } from 'react';
 import { Stage, Layer, Image } from 'react-konva';
 import './App.css';
 
+// Função para carregar dinamicamente todas as pastas dentro de /src/images/
+const importOutfits = () => {
+  const context = require.context('./images', true, /\.(png|jpe?g|svg)$/);
+  const outfits = {};
+
+  context.keys().forEach((key) => {
+    // Extrair o nome da pasta (outfit)
+    const pathParts = key.split('/');
+    if (pathParts.length < 2) return;
+
+    const folderName = pathParts[1]; // Nome da pasta (outfit)
+
+    if (!outfits[folderName]) {
+      outfits[folderName] = [];
+    }
+
+    outfits[folderName].push({
+      name: key.replace('./', ''),
+      src: context(key),
+    });
+  });
+
+  return Object.keys(outfits).map((folderName) => ({
+    name: folderName,
+    images: outfits[folderName].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { numeric: true })
+    ),
+  }));
+};
+
+// Carregar os outfits dinamicamente
+const outfits = importOutfits();
+
 const RecolorTool = () => {
-  // Lista de imagens base
-  const baseImages = [
-    `${process.env.PUBLIC_URL}/images/outfit1-brown.png`,
-    `${process.env.PUBLIC_URL}/images/outfit1-pink.png`,
-    `${process.env.PUBLIC_URL}/images/outfit1-purple.png`,
-    `${process.env.PUBLIC_URL}/images/outfit1-blue.png`,
-    `${process.env.PUBLIC_URL}/images/outfit1-green.png`,
-  ];
-
-  // Lista de imagens do corset
-  const corsetImages = [
-    `${process.env.PUBLIC_URL}/images/corset-brown.png`,
-    `${process.env.PUBLIC_URL}/images/corset-pink.png`,
-    `${process.env.PUBLIC_URL}/images/corset-purple.png`,
-    `${process.env.PUBLIC_URL}/images/corset-blue.png`,
-    `${process.env.PUBLIC_URL}/images/corset-green.png`,
-  ];
-
-  // Estados para controle de Hue
+  const [currentOutfitIndex, setCurrentOutfitIndex] = useState(0);
   const [baseHue, setBaseHue] = useState(0);
   const [corsetHue, setCorsetHue] = useState(0);
-
-  // Estados para armazenar as imagens carregadas
   const [currentBaseImage, setCurrentBaseImage] = useState(null);
   const [currentCorsetImage, setCurrentCorsetImage] = useState(null);
 
+  const currentOutfit = outfits[currentOutfitIndex] || { images: [] };
+
+  // Filtrar imagens por tipo (base, corset, etc.)
+  const baseImages = currentOutfit.images.filter((img) => img.name.includes('base'));
+  const corsetImages = currentOutfit.images.filter((img) => img.name.includes('corset'));
+
   // Carregar a imagem base
   useEffect(() => {
-    const img = new window.Image();
-    const index = Math.floor(baseHue / (360 / baseImages.length));
-    img.src = baseImages[index];
-    img.onload = () => setCurrentBaseImage(img);
-  }, [baseHue]);
+    if (baseImages.length > 0) {
+      const img = new window.Image();
+      const index = Math.floor(baseHue / (360 / baseImages.length));
+      img.src = baseImages[index]?.src;
+      img.onload = () => setCurrentBaseImage(img);
+    }
+  }, [baseHue, baseImages]);
 
-  // Carregar a imagem do corset
+  // Carregar a imagem do corset (apenas se houver variações)
   useEffect(() => {
-    const img = new window.Image();
-    const index = Math.floor(corsetHue / (360 / corsetImages.length));
-    img.src = corsetImages[index];
-    img.onload = () => setCurrentCorsetImage(img);
-  }, [corsetHue]);
+    if (corsetImages.length > 0) {
+      const img = new window.Image();
+      const index = Math.floor(corsetHue / (360 / corsetImages.length));
+      img.src = corsetImages[index]?.src;
+      img.onload = () => setCurrentCorsetImage(img);
+    } else {
+      setCurrentCorsetImage(null); // Remover a imagem de corset se não houver variações
+    }
+  }, [corsetHue, corsetImages]);
 
-  // Função para calcular escala e centralizar a imagem
   const calculateScale = (image, canvasWidth, canvasHeight) => {
     const scale = Math.min(canvasWidth / image.width, canvasHeight / image.height);
     return scale;
@@ -53,10 +77,9 @@ const RecolorTool = () => {
 
   return (
     <div className="editor">
-      <h1>Recolor Your Clothes!</h1>
+      <h1>{currentOutfit.name}</h1>
 
       <div className="controls">
-        {/* Controle para a imagem base */}
         <div>
           <label>Base Hue</label>
           <input
@@ -67,8 +90,6 @@ const RecolorTool = () => {
             onChange={(e) => setBaseHue(Number(e.target.value))}
           />
         </div>
-
-        {/* Controle para o corset */}
         <div>
           <label>Corset Hue</label>
           <input
@@ -77,11 +98,11 @@ const RecolorTool = () => {
             max="360"
             value={corsetHue}
             onChange={(e) => setCorsetHue(Number(e.target.value))}
+            disabled={corsetImages.length === 0} // Desativar se não houver variações de corset
           />
         </div>
       </div>
 
-      {/* Canvas para renderizar as imagens */}
       <Stage width={500} height={500} className="canvas">
         <Layer>
           {currentBaseImage && (
@@ -108,6 +129,21 @@ const RecolorTool = () => {
           )}
         </Layer>
       </Stage>
+
+      <div className="pagination">
+        <button
+          disabled={currentOutfitIndex === 0}
+          onClick={() => setCurrentOutfitIndex((prev) => prev - 1)}
+        >
+          Previous
+        </button>
+        <button
+          disabled={currentOutfitIndex === outfits.length - 1}
+          onClick={() => setCurrentOutfitIndex((prev) => prev + 1)}
+        >
+          Next
+        </button>
+      </div>
 
       <button
         onClick={() => {

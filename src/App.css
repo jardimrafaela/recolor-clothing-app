@@ -65,7 +65,12 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]:hover {
   opacity: 1;
 }
-/*teste */
+
+input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Botão de download */
 button {
   background-color: #4caf50;
