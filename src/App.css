@@ -1,34 +1,42 @@
-/* Estilo básico do corpo da página */
-body {
-  font-family: 'Poppins', Arial, sans-serif;
-  background-color: #f0f0f5;
+/* ====== Global Reset ====== */
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', Arial, sans-serif;
+  background: linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%);
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  overflow: hidden;
 }
 
-/* Estilo do contêiner principal */
+/* ====== Main Container ====== */
 .editor {
-  background-color: #ffffff;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  max-width: 700px;
-  width: 100%;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  max-width: 1000px;
+  width: 95%;
   text-align: center;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-/* Título da página */
+/* ====== Title ====== */
 h1 {
-  color: #333333;
-  font-size: 28px;
-  margin-bottom: 20px;
+  color: #333;
+  font-size: 36px;
+  margin-bottom: 30px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilo dos controles (sliders) */
+/* ====== Controls Section ====== */
 .controls {
   display: flex;
   flex-direction: column;
@@ -37,33 +45,33 @@ h1 {
 }
 
 .controls label {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  color: #444;
+  color: #555;
 }
 
 input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
-  height: 6px;
+  height: 8px;
   border-radius: 5px;
-  background: #ddd;
+  background: #dfe6ed;
   outline: none;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  transition: background 0.3s;
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 15px;
-  height: 15px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: #333;
+  background: #4caf50;
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 input[type="range"]:hover {
-  opacity: 1;
+  background: #c4d7e3;
 }
 
 input:disabled {
@@ -71,49 +79,76 @@ input:disabled {
   cursor: not-allowed;
 }
 
-/* Botão de download */
+/* ====== Button Styling ====== */
 button {
-  background-color: #4caf50;
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
   color: white;
   border: none;
-  border-radius: 10px;
-  padding: 12px 20px;
-  font-size: 16px;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 18px;
   cursor: pointer;
-  width: 100%;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-  background-color: #45a049;
+  background: linear-gradient(135deg, #45a049, #58b659);
+  transform: translateY(-2px);
 }
 
-/* Canvas (imagem) */
+button:active {
+  transform: translateY(1px);
+}
+
+/* ====== Pagination Buttons ====== */
+.pagination button {
+  margin: 10px 5px;
+  padding: 10px 18px;
+  font-size: 16px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3b8d99, #6babab);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pagination button:hover {
+  background: linear-gradient(135deg, #357d89, #5e9e9f);
+}
+
+/* ====== Image Canvas ====== */
 .canvas {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid #ddd;
-  border-radius: 10px;
+  border: 2px solid #dfe6ed;
+  border-radius: 15px;
   margin-bottom: 20px;
   background-color: #ffffff;
-  width: 500px;
-  height: 500px;
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
   overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-/* Regras de responsividade */
+
+img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* ====== Responsive Design ====== */
 @media (max-width: 768px) {
   .editor {
-    padding: 20px;
+    padding: 30px;
   }
 
   h1 {
-    font-size: 24px;
+    font-size: 28px;
   }
 
   button {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
-
-
