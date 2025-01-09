@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Stage, Layer, Image } from 'react-konva';
 import './App.css';
 
@@ -31,14 +31,17 @@ const importOutfits = () => {
   }));
 };
 
-const outfits = importOutfits();
-
 const RecolorTool = () => {
   const [currentOutfitIndex, setCurrentOutfitIndex] = useState(0);
   const [baseHue, setBaseHue] = useState(0);
   const [corsetHue, setCorsetHue] = useState(0);
   const [currentBaseImage, setCurrentBaseImage] = useState(null);
   const [currentCorsetImage, setCurrentCorsetImage] = useState(null);
+
+  const stageRef = useRef();
+
+  // Utilizar useMemo dentro do componente
+  const outfits = useMemo(() => importOutfits(), []);
 
   const currentOutfit = outfits[currentOutfitIndex] || { images: [] };
 
@@ -49,42 +52,52 @@ const RecolorTool = () => {
     if (baseImages.length > 0) {
       const img = new window.Image();
       const index = Math.floor(baseHue / (360 / baseImages.length));
+      if (baseImages[index]?.src === currentBaseImage?.src) return;
       img.src = baseImages[index]?.src;
       img.onload = () => setCurrentBaseImage(img);
     }
-  }, [baseHue, baseImages]);
+  }, [baseHue, baseImages, currentBaseImage]);
 
   useEffect(() => {
     if (corsetImages.length > 0) {
       const img = new window.Image();
       const index = Math.floor(corsetHue / (360 / corsetImages.length));
+      if (corsetImages[index]?.src === currentCorsetImage?.src) return;
       img.src = corsetImages[index]?.src;
       img.onload = () => setCurrentCorsetImage(img);
     } else {
       setCurrentCorsetImage(null);
     }
-  }, [corsetHue, corsetImages]);
+  }, [corsetHue, corsetImages, currentCorsetImage]);
 
   // Função para calcular a escala correta da imagem para manter a proporção
   const calculateScale = (image, canvasWidth, canvasHeight) => {
     const scale = Math.min(canvasWidth / image.width, canvasHeight / image.height);
-    return scale;
+    return Math.max(scale, 0.1);
   };
 
   // Obter o tamanho do canvas com base na janela do navegador
   const getCanvasSize = () => {
     const width = Math.min(window.innerWidth * 0.9, 800);
-    const height = Math.min(window.innerHeight * 0.75, 600);
+    const height = Math.min(window.innerHeight * 0.7, 600);
     return { width, height };
   };
 
   const { width: canvasWidth, height: canvasHeight } = getCanvasSize();
 
+  const handleDownload = () => {
+    const uri = stageRef.current.toDataURL();
+    const link = document.createElement('a');
+    link.download = 'edited-image.png';
+    link.href = uri;
+    link.click();
+  };
+
   return (
     <div className="editor">
       <h1>{currentOutfit.name}</h1>
 
-      <Stage width={canvasWidth} height={canvasHeight} className="canvas">
+      <Stage ref={stageRef} width={canvasWidth} height={canvasHeight} className="canvas">
         <Layer>
           {currentBaseImage && (
             <Image
@@ -111,6 +124,21 @@ const RecolorTool = () => {
         </Layer>
       </Stage>
 
+      <button
+        className="arrow left-arrow"
+        disabled={currentOutfitIndex === 0}
+        onClick={() => setCurrentOutfitIndex((prev) => prev - 1)}
+      >
+        &#9664;
+      </button>
+      <button
+        className="arrow right-arrow"
+        disabled={currentOutfitIndex === outfits.length - 1}
+        onClick={() => setCurrentOutfitIndex((prev) => prev + 1)}
+      >
+        &#9654;
+      </button>
+
       <div className="controls">
         <label>Base Hue</label>
         <input
@@ -131,32 +159,7 @@ const RecolorTool = () => {
         />
       </div>
 
-      <div className="pagination">
-        <button
-          disabled={currentOutfitIndex === 0}
-          onClick={() => setCurrentOutfitIndex((prev) => prev - 1)}
-        >
-          Previous
-        </button>
-        <button
-          disabled={currentOutfitIndex === outfits.length - 1}
-          onClick={() => setCurrentOutfitIndex((prev) => prev + 1)}
-        >
-          Next
-        </button>
-      </div>
-
-      <button
-        onClick={() => {
-          const uri = document.querySelector('canvas').toDataURL();
-          const link = document.createElement('a');
-          link.download = 'edited-image.png';
-          link.href = uri;
-          link.click();
-        }}
-      >
-        Download Image
-      </button>
+      <button onClick={handleDownload}>Download Image</button>
     </div>
   );
 };
