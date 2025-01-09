@@ -17,8 +17,8 @@ body {
 
 /* ====== Main Container ====== */
 .editor {
-  background: rgba(255, 255, 255, 0.85);
-  padding: 40px;
+  background: rgba(165, 175, 231, 0.85);
+  padding: 60px;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   max-width: 90%;
@@ -43,9 +43,9 @@ h1 {
   justify-content: center;
   align-items: center;
   border-radius: 15px;
-  background-color: #ffffff;
+  background-color: #a7ade4;
   width: 100%;
-  max-width: 800px;
+  max-width: 2000px;
   height: auto;
   max-height: 70vh;
   overflow: hidden;
